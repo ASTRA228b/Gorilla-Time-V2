@@ -106,7 +106,7 @@ public class Main : MonoBehaviour
         {
             timeSettings = TimeSettings.Day;
         }
-        if (GUILayout.Toggle(timeSettings == TimeSettings.Evning, "Evning"))
+        if (GUILayout.Toggle(timeSettings == TimeSettings.Evning, "Evening"))
         {
             timeSettings = TimeSettings.Evning;
         }
@@ -140,7 +140,7 @@ public class Main : MonoBehaviour
     private Texture2D MakeTex(int width, int height, Color col)
     {
         Texture2D result = new Texture2D(width, height);
-        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) result.SetPixel(x, y, col);
+        result.SetPixel(0, 0, col);
         result.Apply();
         return result;
     }

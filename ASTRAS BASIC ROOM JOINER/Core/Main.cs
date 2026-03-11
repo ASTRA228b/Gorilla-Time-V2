@@ -23,8 +23,6 @@ public class Main : MonoBehaviour
     private GUIStyle? WStyle, BStyle;
     private Color WColor = new Color(0.1f, 0.1f, 0.1f, 1f);
     private Color BColor = new Color(0.2f, 0.2f, 0.2f, 1f);
-    private Color SColor = new Color(0.15f, 0.15f, 0.15f, 1f);
-    private Color STColor = new Color(0.0f, 0.6f, 1f, 1f);
     private bool Open = false;
     private bool StylesINIT = false;
 

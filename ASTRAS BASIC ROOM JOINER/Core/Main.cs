@@ -1,6 +1,8 @@
 ﻿
+using Photon.Voice;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static BetterDayNightManager;
 
 namespace Gorilla_Time.Core;
 
@@ -17,56 +19,25 @@ public class Main : MonoBehaviour
     }
     private TimeSettings timeSettings = TimeSettings.None;
     private Rect Window = new Rect(110f, 110f, 220f, 220f);
-    private Color WindowColor = new Color(0.15f, 0.15f, 0.15f, 1f);
-    private Color ButtonColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+    private Texture2D? WTex, BBackground;
+    private GUIStyle? WStyle, BStyle;
+    private Color WColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+    private Color BColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+    private Color SColor = new Color(0.15f, 0.15f, 0.15f, 1f);
+    private Color STColor = new Color(0.0f, 0.6f, 1f, 1f);
     private bool Open = false;
     private bool StylesINIT = false;
-    private Texture2D? windowTex, solidTex;
-    private GUIStyle? buttons, windowStyle;
 
     private void OnGUI()
     {
         if (!StylesINIT)
         {
-            if (solidTex != null)
-                return;
-            
-            solidTex = MakeTex(1, 1, new Color(0.15f, 0.15f, 0.15f, 1f));
-            windowTex = MakeTex(1, 1, WindowColor);
-            windowStyle = new GUIStyle(GUI.skin.window);
-            windowStyle.normal.background = windowTex;
-            windowStyle.hover.background = windowTex;
-            windowStyle.active.background = windowTex;
-            windowStyle.focused.background = windowTex;
-            windowStyle.onNormal.background = windowTex;
-            windowStyle.onHover.background = windowTex;
-            windowStyle.onActive.background = windowTex;
-            windowStyle.onFocused.background = windowTex;
-            windowStyle.normal.textColor = Color.white;
-            windowStyle.fontStyle = (FontStyle)1;
-            Texture2D background = MakeTex(1, 1, ButtonColor);
-            buttons = new GUIStyle(GUI.skin.button);
-            buttons.normal.background = background;
-            buttons.active.background = background;
-            buttons.hover.background = background;
-            buttons.focused.background = background;
-            buttons.onNormal.background = background;
-            buttons.onActive.background = background;
-            buttons.onHover.background = background;
-            buttons.onFocused.background = background;
-            buttons.normal.textColor = Color.white;
-            buttons.hover.textColor = Color.blue;
-            buttons.active.textColor = Color.red;
-            buttons.focused.textColor = Color.white;
-            buttons.onNormal.textColor = Color.blue;
-            buttons.onHover.textColor = Color.blue;
-            buttons.onActive.textColor = Color.blue;
-            buttons.onFocused.textColor = Color.blue;
+            INIT();
             StylesINIT = true;
         }
         if (Open)
         {
-            Window = GUILayout.Window(12232342, Window, UIMAKER, "Gorilla Time V2", windowStyle);
+            Window = GUILayout.Window(12232342, Window, UIMAKER, "Gorilla Time V2", WStyle);
         }
     }
 
@@ -84,15 +55,15 @@ public class Main : MonoBehaviour
     }
     void UIMAKER(int id)
     {
-        CONTROLLER();
+        GTimeModController();
         GUILayout.Space(5f);
-        if (GUILayout.Button("Close", buttons))
+        if (GUILayout.Button("Close", BStyle))
         {
             Open = !Open;
         }
         GUI.DragWindow();
     }
-    private void CONTROLLER()
+    private void GTimeModController()
     {
         if (GUILayout.Toggle(timeSettings == TimeSettings.Morning, "Morning"))
         {
@@ -113,6 +84,37 @@ public class Main : MonoBehaviour
         if (GUILayout.Toggle(timeSettings == TimeSettings.Night, "Night"))
         {
             timeSettings = TimeSettings.Night;
+        }
+        GUILayout.Space(5f);
+        GUILayout.Label("Weather");
+        if (GUILayout.Button("Start Rain", BStyle))
+        {
+            StartRain();
+        }
+        if (GUILayout.Button("Stop Rain", BStyle))
+        {
+            StopRain();
+        }
+    }
+
+    private void StartRain()
+    {
+        var manager = BetterDayNightManager.instance;
+        if (manager == null || manager.weatherCycle == null)
+            return;
+        for (int Yes = 1; Yes < manager.weatherCycle.Length; Yes++)
+        {
+            manager.weatherCycle[Yes] = (WeatherType)1;
+        }
+    }
+    private void StopRain()
+    {
+        var manager = BetterDayNightManager.instance;
+        if (manager == null || manager.weatherCycle == null)
+            return;
+        for (int No = 1; No < manager.weatherCycle.Length; No++)
+        {
+            manager.weatherCycle[No] = (WeatherType)0;
         }
     }
     private void SystemSwitch()
@@ -137,11 +139,44 @@ public class Main : MonoBehaviour
         }
     }
 
-    private Texture2D MakeTex(int width, int height, Color col)
+    private void INIT()
     {
-        Texture2D result = new Texture2D(width, height);
-        result.SetPixel(0, 0, col);
-        result.Apply();
-        return result;
+        WTex = MakeTexture(1, 1, WColor);
+        BBackground = MakeTexture(1, 1, BColor);
+        WStyle = new GUIStyle(GUI.skin.window);
+        WStyle.normal.background = WTex;
+        WStyle.hover.background = WTex;
+        WStyle.active.background = WTex;
+        WStyle.focused.background = WTex;
+        WStyle.onActive.background = WTex;
+        WStyle.onNormal.background = WTex;
+        WStyle.onFocused.background = WTex;
+        WStyle.normal.textColor = Color.white;
+        WStyle.fontStyle = FontStyle.Normal;
+        BStyle = new GUIStyle(GUI.skin.button);
+        BStyle.normal.background = BBackground;
+        BStyle.active.background = BBackground;
+        BStyle.hover.background = BBackground;
+        BStyle.focused.background = BBackground;
+        BStyle.onHover.background = BBackground;
+        BStyle.onNormal.background = BBackground;
+        BStyle.onActive.background = BBackground;
+        BStyle.onFocused.background = BBackground;
+        BStyle.normal.textColor = Color.white;
+        BStyle.hover.textColor = Color.blue;
+        BStyle.active.textColor = Color.red;
+        BStyle.focused.textColor = Color.white;
+        BStyle.onNormal.textColor = Color.blue;
+        BStyle.onHover.textColor = Color.blue;
+        BStyle.onActive.textColor = Color.blue;
+        BStyle.onFocused.textColor = Color.blue;
+    }
+
+    private Texture2D MakeTexture(int WW, int HH, Color CC)
+    {
+        Texture2D value = new Texture2D(WW, HH);
+        value.SetPixel(0, 0, CC);
+        value.Apply();
+        return value;
     }
 }
